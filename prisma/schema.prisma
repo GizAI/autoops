@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("user") // admin, user
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+// ProcessedEmail model to track emails that have been processed
+model ProcessedEmail {
+  id         Int       @id @default(autoincrement())
+  messageId  String    @unique @map("message_id")
+  threadId   String    @map("thread_id")
+  fromEmail  String    @map("from_email")
+  subject    String
+  receivedAt DateTime  @map("received_at")
+  language   String?
+  status     String    @default("pending") // pending, processed, failed
+  responseId Int?      @map("response_id")
+  response   Response? @relation(fields: [responseId], references: [id])
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  @@map("processed_emails")
+}
+
+// KnowledgeBase model for storing knowledge entries with vector embeddings
+model KnowledgeBase {
+  id        Int      @id @default(autoincrement())
+  content   String
+  embedding Unsupported("vector(1536)")? // Using pgvector for embeddings
+  source    String
+  sourceId  String?  @map("source_id")
+  category  String?
+  language  String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("knowledge_base")
+}
+
+// Response model for storing generated email responses
+model Response {
+  id              Int             @id @default(autoincrement())
+  threadId        String          @map("thread_id")
+  subject         String
+  body            String
+  htmlBody        String?         @map("html_body")
+  language        String
+  status          String          @default("draft") // draft, sent, discarded
+  sentAt          DateTime?       @map("sent_at")
+  knowledgeSources Json?          @map("knowledge_sources")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  processedEmails ProcessedEmail[]
+
+  @@map("responses")
+}
