@@ -4,7 +4,8 @@ import { logger } from '../utils/logger';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.LITELLM_API_KEY,
+  baseURL: process.env.LITELLM_BASE_URL
 });
 
 // Configure rate limiter
@@ -100,7 +101,7 @@ Subject: [Your subject line]
     // Generate response with rate limiting
     const response = await limiter.schedule(() =>
       openai.chat.completions.create({
-        model: process.env.OPENAI_MODEL || 'gpt-4-turbo',
+        model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
         messages: [
           { role: 'system', content: systemMessage },
           { role: 'user', content: userMessage }

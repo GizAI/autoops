@@ -5,7 +5,7 @@ import { logger } from '../utils/logger';
 
 // Express Request interface is extended in src/types/express.d.ts
 
-export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticate: any = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Get token from header
     const authHeader = req.headers.authorization;

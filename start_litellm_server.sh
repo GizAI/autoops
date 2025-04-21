@@ -10,4 +10,4 @@ export OPENAI_API_BASE="https://api.openai.com/v1"
 
 # LiteLLM 서버 실행
 source litellm_env/bin/activate
-litellm --config litellm_config.yaml --port 8000 --model mock
+litellm --config litellm_config.yaml --port 8000
