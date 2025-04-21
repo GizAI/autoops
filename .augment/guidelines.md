@@ -39,6 +39,13 @@
 - Regularly check development server status and fix any issues
 - Verify both frontend and backend servers are running correctly
 - Regularly check browser access to verify UI is rendering properly
+- Test API endpoints and frontend-backend integration frequently
+- Fix any proxy or connection issues between frontend and backend
+- Test login functionality with test users:
+  - Regular user: email=test@example.com, password=password123
+  - Admin user: email=admin@example.com, password=admin123
+- Verify that authentication and authorization are working correctly
+- Ensure all pages render correctly after login
 
 ## Code Organization
 - Refactor code when needed to improve maintainability

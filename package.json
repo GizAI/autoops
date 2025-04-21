@@ -19,7 +19,8 @@
     "test:ci": "npm run test:all -- --ci",
     "test:auto": "ts-node src/scripts/run-tests.ts",
     "test:auto:fix": "ts-node src/scripts/fix-tests.ts",
-    "test:monitor": "ts-node src/scripts/auto-test-runner.ts"
+    "test:monitor": "ts-node src/scripts/auto-test-runner.ts",
+    "create:test-users": "ts-node src/scripts/create-test-user.ts"
   },
   "keywords": [],
   "author": "",
