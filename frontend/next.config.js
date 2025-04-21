@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:3001/:path*', // Proxy to Backend
+        destination: 'http://localhost:3001/api/:path*', // Proxy to Backend
       },
     ];
   },
@@ -24,6 +24,10 @@ const nextConfig = {
   },
   // Allow development origins
   allowedDevOrigins: ['*'],
+  // Allow connections from any IP
+  experimental: {
+    serverComponentsExternalPackages: ['puppeteer']
+  },
 };
 
 module.exports = nextConfig;

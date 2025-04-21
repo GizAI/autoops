@@ -28,8 +28,8 @@
 
 ## Testing and Quality Assurance
 - Autonomously test both API and web UI using appropriate tools
-- Use Jest/Supertest for API testing
-- Use Puppeteer for UI testing
+- Use Jest/Supertest for unit and integration testing
+- Use Playwright for E2E testing
 - Run tests automatically after code changes
 - Fix issues without human intervention
 - Update guidelines with testing procedures
@@ -46,10 +46,21 @@
   - Admin user: email=admin@example.com, password=admin123
 - Verify that authentication and authorization are working correctly
 - Ensure all pages render correctly after login
-- Automatically test UI functionality using Puppeteer for browser automation
-- Capture screenshots or DOM structure to verify UI rendering
-- Test API endpoints using axios or fetch directly from code
-- After implementing new features, run automated tests to verify functionality
+- Capture and analyze browser console errors during testing
+- Run E2E tests with Playwright:
+  - `npm run test:e2e` - Run all E2E tests
+  - `npm run test:e2e:ui` - Run tests with UI mode
+  - `npm run test:e2e:debug` - Run tests in debug mode
+  - `npm run test:e2e:report` - Show test reports
+- Avoid common mistakes:
+  - Always check for correct API paths in proxy settings
+  - Ensure API endpoints match between frontend and backend
+  - Verify that test users exist before testing authentication
+  - Check for port conflicts between frontend and backend servers
+  - Use relative API paths in frontend code when possible
+  - Test with both local and remote access scenarios
+  - Monitor browser console for errors during testing
+  - Verify network requests in browser developer tools
 - Document test results with evidence of successful operation
 
 ## Code Organization
