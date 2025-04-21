@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "name": "Add user management for admin",
+    "description": "Implement user management functionality for admin users",
+    "status": "pending",
+    "priority": "high",
+    "retries": 0,
+    "createdAt": "2025-04-21T16:40:00.000Z",
+    "updatedAt": "2025-04-21T16:40:00.000Z"
+  },
+  {
+    "id": "2",
+    "name": "Implement email notification system",
+    "description": "Create a system to send email notifications for important events",
+    "status": "pending",
+    "priority": "medium",
+    "retries": 0,
+    "createdAt": "2025-04-21T16:40:00.000Z",
+    "updatedAt": "2025-04-21T16:40:00.000Z"
+  },
+  {
+    "id": "3",
+    "name": "Add search functionality across emails",
+    "description": "Implement search functionality to search across all emails",
+    "status": "pending",
+    "priority": "medium",
+    "retries": 0,
+    "createdAt": "2025-04-21T16:40:00.000Z",
+    "updatedAt": "2025-04-21T16:40:00.000Z"
+  },
+  {
+    "id": "4",
+    "name": "Improve test coverage with Playwright E2E tests",
+    "description": "Add more E2E tests to improve test coverage",
+    "status": "pending",
+    "priority": "low",
+    "retries": 0,
+    "createdAt": "2025-04-21T16:40:00.000Z",
+    "updatedAt": "2025-04-21T16:40:00.000Z"
+  }
+]

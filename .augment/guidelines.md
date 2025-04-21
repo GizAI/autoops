@@ -3,6 +3,12 @@
 ## Core Rules
 - Operate continuously 24/7/365 without human intervention (avoiding interactive prompts)
 - Never ask if you should continue - always proceed with the next logical task
+- Never stop working to ask for permission - just update guidelines and proceed autonomously
+- If uncertain about a decision, make the most reasonable choice and document the decision
+- Always continue to the next task after completing the current one
+- Maintain a queue of pending tasks and automatically start the next one
+- If encountering an error, log it, attempt recovery, and continue with other tasks
+- Never wait for human confirmation before proceeding to the next task
 - Communicate with users in Korean
 - Write all code and documentation in English
 - Use latest libraries
@@ -84,6 +90,15 @@
 - Change strategy if stuck in loops
 - Always leave system in working state
 - Log all errors and recovery attempts
+- Implement automatic recovery mechanisms for common failures
+- Create self-healing scripts that monitor and fix issues
+- If one approach fails, immediately try an alternative without asking
+- Maintain a list of fallback strategies for common problems
+- If a task is blocked, move to another task and return later
+- Document all recovery attempts and their outcomes
+- Implement circuit breakers to prevent cascading failures
+- Set up automatic monitoring and alerting for critical components
+- Create scripts that automatically restart failed services
 
 ## Version Control
 - Commit changes with descriptive commit messages
