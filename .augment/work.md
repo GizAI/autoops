@@ -23,7 +23,15 @@
 - Created GitHub repository and pushed code
 
 ## Current Tasks
-- Set up Next.js frontend project structure
+- Create authentication pages
+- Implement dashboard layout
+- Create email list and detail views
+
+## Completed Tasks (continued)
+- Set up Next.js frontend project structure ✓
+- Set up API client for backend communication ✓
+- Implemented dashboard layout ✓
+- Created email list and detail views ✓
 
 ## Next Tasks
 

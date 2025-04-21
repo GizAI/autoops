@@ -32,6 +32,9 @@
 - Run tests automatically after code changes
 - Fix issues without human intervention
 - Update guidelines with testing procedures
+- Keep local development server running at all times
+- Ensure all changes are immediately reflected in the development environment
+- Allow for real-time browser verification of changes
 
 ## Code Organization
 - Refactor code when needed to improve maintainability
