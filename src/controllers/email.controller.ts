@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import { google } from 'googleapis';
 import { prisma } from '../index';
 import { logger } from '../utils/logger';
-import { detectLanguage } from '../utils/language';
 import crypto from 'crypto';
+import { notificationService } from '../services/notification.service';
+import { parseGmailMessage, downloadAttachment, ParsedEmail } from '../utils/email-parser';
+import * as EmailModel from '../models/email.model';
 
 // Gmail API setup
 const gmail = google.gmail('v1');
@@ -43,16 +45,13 @@ export const syncEmails = async (req: Request, res: Response) => {
     });
 
     const messages = response.data.messages || [];
-    const processedEmails = [];
+    const processedEmails: any[] = [];
 
     for (const message of messages) {
       if (!message.id) continue;
 
       // Check if email is already processed
-      const existingEmail = await prisma.processedEmail.findUnique({
-        where: { messageId: message.id }
-      });
-
+      const existingEmail = await EmailModel.getProcessedEmailByMessageId(message.id, false);
       if (existingEmail) continue;
 
       // Get email details
@@ -64,44 +63,38 @@ export const syncEmails = async (req: Request, res: Response) => {
 
       if (!emailData.data || !emailData.data.payload) continue;
 
-      // Extract email data
-      const headers = emailData.data.payload.headers || [];
-      const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
-      const from = headers.find(h => h.name === 'From')?.value || '';
-      const fromEmail = from.match(/<(.+)>/) ? from.match(/<(.+)>/)![1] : from;
-      const threadId = emailData.data.threadId || '';
-      const receivedAt = new Date(parseInt(emailData.data.internalDate || '0'));
+      // Parse email using the new utility
+      const parsedEmail = parseGmailMessage(emailData.data);
 
-      // Get email body
-      let body = '';
-      if (emailData.data.payload.parts) {
-        for (const part of emailData.data.payload.parts) {
-          if (part.mimeType === 'text/plain' && part.body && part.body.data) {
-            body = Buffer.from(part.body.data, 'base64').toString('utf-8');
-            break;
+      // Download attachments if any
+      for (let i = 0; i < parsedEmail.attachments.length; i++) {
+        const attachment = parsedEmail.attachments[i];
+        if (attachment.attachmentId) {
+          try {
+            const attachmentData = await downloadAttachment(
+              gmail,
+              oauth2Client,
+              parsedEmail.messageId,
+              attachment.attachmentId
+            );
+            parsedEmail.attachments[i].data = attachmentData;
+          } catch (attachmentError) {
+            logger.error(`Failed to download attachment ${attachment.filename}:`, attachmentError);
           }
         }
-      } else if (emailData.data.payload.body && emailData.data.payload.body.data) {
-        body = Buffer.from(emailData.data.payload.body.data, 'base64').toString('utf-8');
       }
 
-      // Detect language
-      const language = detectLanguage(body);
-
       // Track the email in our database
-      const processedEmail = await prisma.processedEmail.create({
-        data: {
-          messageId: message.id,
-          threadId,
-          fromEmail,
-          subject,
-          receivedAt,
-          language,
-          status: 'pending'
-        }
-      });
-
+      const processedEmail = await EmailModel.createProcessedEmail(parsedEmail);
       processedEmails.push(processedEmail);
+
+      // Send notification to admin about new email
+      await notificationService.notifyAdminOfNewEmail(
+        processedEmail.id,
+        parsedEmail.fromEmail,
+        parsedEmail.subject,
+        parsedEmail.receivedAt
+      );
 
       // Mark the email as read in Gmail
       await gmail.users.messages.modify({
@@ -138,11 +131,8 @@ export const getProcessedEmails = async (req: Request, res: Response) => {
       userId: req.user?.id,
       timestamp: new Date().toISOString()
     });
-    const emails = await prisma.processedEmail.findMany({
-      orderBy: { receivedAt: 'desc' },
-      include: { response: true }
-    });
 
+    const emails = await EmailModel.getAllProcessedEmails();
     res.json(emails);
   } catch (error) {
     logger.error('Get processed emails error:', error);
@@ -161,10 +151,7 @@ export const getProcessedEmailById = async (req: Request, res: Response) => {
       timestamp: new Date().toISOString()
     });
 
-    const email = await prisma.processedEmail.findUnique({
-      where: { id: parseInt(id) },
-      include: { response: true }
-    });
+    const email = await EmailModel.getProcessedEmailById(parseInt(id));
 
     if (!email) {
       return res.status(404).json({ message: 'Email not found' });
@@ -206,40 +193,54 @@ export const getEmailsByThreadId = async (req: Request, res: Response) => {
 
     // Process messages in the thread
     const messages = response.data.messages.map(message => {
-      const headers = message.payload?.headers || [];
-      const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
-      const from = headers.find(h => h.name === 'From')?.value || '';
-      const to = headers.find(h => h.name === 'To')?.value || '';
-      const date = headers.find(h => h.name === 'Date')?.value || '';
+      // Parse email using the new utility
+      try {
+        const parsedEmail = parseGmailMessage(message);
+        return {
+          id: parsedEmail.messageId,
+          threadId: parsedEmail.threadId,
+          snippet: message.snippet,
+          subject: parsedEmail.subject,
+          from: parsedEmail.headers.from,
+          to: parsedEmail.headers.to,
+          date: parsedEmail.headers.date,
+          body: parsedEmail.textBody,
+          htmlBody: parsedEmail.htmlBody,
+          fromEmail: parsedEmail.fromEmail,
+          fromName: parsedEmail.fromName,
+          receivedAt: parsedEmail.receivedAt,
+          language: parsedEmail.language,
+          hasAttachments: parsedEmail.attachments.length > 0,
+          attachmentCount: parsedEmail.attachments.length
+        };
+      } catch (parseError) {
+        logger.error(`Error parsing message ${message.id}:`, parseError);
+        // Fallback to basic extraction if parsing fails
+        const headers = message.payload?.headers || [];
+        const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+        const from = headers.find(h => h.name === 'From')?.value || '';
+        const to = headers.find(h => h.name === 'To')?.value || '';
+        const date = headers.find(h => h.name === 'Date')?.value || '';
 
-      // Get message body
-      let body = '';
-      if (message.payload?.parts) {
-        for (const part of message.payload.parts) {
-          if (part.mimeType === 'text/plain' && part.body && part.body.data) {
-            body = Buffer.from(part.body.data, 'base64').toString('utf-8');
-            break;
-          }
-        }
-      } else if (message.payload?.body && message.payload.body.data) {
-        body = Buffer.from(message.payload.body.data, 'base64').toString('utf-8');
+        return {
+          id: message.id,
+          threadId: message.threadId,
+          snippet: message.snippet,
+          subject,
+          from,
+          to,
+          date
+        };
       }
-
-      return {
-        id: message.id,
-        threadId: message.threadId,
-        snippet: message.snippet,
-        subject,
-        from,
-        to,
-        date,
-        body
-      };
     });
+
+    // Get processed emails from database for this thread
+    const processedEmails = await EmailModel.getProcessedEmailsByThreadId(threadId);
 
     res.json({
       threadId,
-      messages
+      messages,
+      processedEmails
     });
   } catch (error) {
     logger.error('Get emails by thread error:', error);
@@ -312,49 +313,29 @@ export const handleGmailPushNotification = async (req: Request, res: Response) =
 
                 // Only process emails sent to our support email
                 if (to.includes(process.env.SUPPORT_EMAIL || '')) {
-                  // Process the email similar to syncEmails function
-                  const subject = headers.find(h => h.name === 'Subject')?.value || 'No Subject';
-                  const from = headers.find(h => h.name === 'From')?.value || '';
-                  const fromEmail = from.match(/<(.+)>/) ? from.match(/<(.+)>/)![1] : from;
-                  const threadId = emailData.data.threadId || '';
-                  const receivedAt = new Date(parseInt(emailData.data.internalDate || '0'));
+                  try {
+                    // Parse email using the new utility
+                    const parsedEmail = parseGmailMessage(emailData.data);
 
-                  // Get email body
-                  let body = '';
-                  if (emailData.data.payload.parts) {
-                    for (const part of emailData.data.payload.parts) {
-                      if (part.mimeType === 'text/plain' && part.body && part.body.data) {
-                        body = Buffer.from(part.body.data, 'base64').toString('utf-8');
-                        break;
-                      }
+                    // Check if email is already processed
+                    const existingEmail = await EmailModel.getProcessedEmailByMessageId(message.id, false);
+
+                    if (!existingEmail) {
+                      // Track the email in our database
+                      const processedEmail = await EmailModel.createProcessedEmail(parsedEmail);
+
+                      // Send notification to admin about new email
+                      await notificationService.notifyAdminOfNewEmail(
+                        processedEmail.id,
+                        parsedEmail.fromEmail,
+                        parsedEmail.subject,
+                        parsedEmail.receivedAt
+                      );
+
+                      logger.info(`Processed new email from webhook: ${parsedEmail.subject}`);
                     }
-                  } else if (emailData.data.payload.body && emailData.data.payload.body.data) {
-                    body = Buffer.from(emailData.data.payload.body.data, 'base64').toString('utf-8');
-                  }
-
-                  // Detect language
-                  const language = detectLanguage(body);
-
-                  // Check if email is already processed
-                  const existingEmail = await prisma.processedEmail.findUnique({
-                    where: { messageId: message.id }
-                  });
-
-                  if (!existingEmail) {
-                    // Track the email in our database
-                    await prisma.processedEmail.create({
-                      data: {
-                        messageId: message.id,
-                        threadId,
-                        fromEmail,
-                        subject,
-                        receivedAt,
-                        language,
-                        status: 'pending'
-                      }
-                    });
-
-                    logger.info(`Processed new email from webhook: ${subject}`);
+                  } catch (parseError) {
+                    logger.error(`Error processing email ${message.id} from webhook:`, parseError);
                   }
                 }
               }
