@@ -44,3 +44,14 @@
 - Change strategy if stuck in loops
 - Always leave system in working state
 - Log all errors and recovery attempts
+
+## Version Control
+- Commit changes with descriptive commit messages
+- Commit and push after updating work history
+- Use the following commit message format:
+  - `feat: Add new feature`
+  - `fix: Fix bug or issue`
+  - `docs: Update documentation`
+  - `refactor: Code refactoring`
+  - `test: Add or update tests`
+  - `chore: Maintenance tasks`
