@@ -14,7 +14,7 @@ const config = {
   backendUrl: 'http://localhost:3001',
   apiEndpoints: [
     '/api/auth/login',
-    '/api/emails',
+    '/api/emails/processed',
     '/api/responses',
     '/api/knowledge'
   ]
@@ -35,7 +35,7 @@ async function isServerResponding(url: string): Promise<boolean> {
   try {
     await axios.get(url, { timeout: 5000 });
     return true;
-  } catch (error) {
+  } catch (error: any) {
     if (error.response) {
       // Server responded with an error code, but it's still responding
       return true;
@@ -51,7 +51,7 @@ async function checkApiEndpoints(): Promise<void> {
       const url = `${config.backendUrl}${endpoint}`;
       await axios.get(url, { timeout: 5000 });
       logger.info(`API endpoint ${endpoint} is responding`);
-    } catch (error) {
+    } catch (error: any) {
       if (error.response) {
         // Server responded with an error code, but it's still responding
         logger.info(`API endpoint ${endpoint} responded with status ${error.response.status}`);
@@ -87,36 +87,36 @@ async function restartBackendServer(): Promise<void> {
 // Main monitoring function
 async function monitorServers(): Promise<void> {
   logger.info('Starting server monitoring...');
-  
+
   try {
     // Check frontend server
     const isFrontendPortInUse = await isPortInUse(config.frontendPort);
     const isFrontendResponding = await isServerResponding(config.frontendUrl);
-    
+
     if (!isFrontendPortInUse || !isFrontendResponding) {
       logger.error('Frontend server is not running or not responding');
       await restartFrontendServer();
     } else {
       logger.info('Frontend server is running and responding');
     }
-    
+
     // Check backend server
     const isBackendPortInUse = await isPortInUse(config.backendPort);
     const isBackendResponding = await isServerResponding(config.backendUrl);
-    
+
     if (!isBackendPortInUse || !isBackendResponding) {
       logger.error('Backend server is not running or not responding');
       await restartBackendServer();
     } else {
       logger.info('Backend server is running and responding');
-      
+
       // Check API endpoints
       await checkApiEndpoints();
     }
   } catch (error) {
     logger.error('Error during server monitoring:', error);
   }
-  
+
   // Schedule next check
   setTimeout(monitorServers, config.checkIntervalMs);
 }
