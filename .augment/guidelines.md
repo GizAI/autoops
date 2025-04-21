@@ -46,6 +46,11 @@
   - Admin user: email=admin@example.com, password=admin123
 - Verify that authentication and authorization are working correctly
 - Ensure all pages render correctly after login
+- Automatically test UI functionality using Puppeteer for browser automation
+- Capture screenshots or DOM structure to verify UI rendering
+- Test API endpoints using axios or fetch directly from code
+- After implementing new features, run automated tests to verify functionality
+- Document test results with evidence of successful operation
 
 ## Code Organization
 - Refactor code when needed to improve maintainability
