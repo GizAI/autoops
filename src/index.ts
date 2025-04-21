@@ -31,12 +31,14 @@ import emailRoutes from './routes/email.routes';
 import knowledgeRoutes from './routes/knowledge.routes';
 import responseRoutes from './routes/response.routes';
 import authRoutes from './routes/auth.routes';
+import userRoutes from './routes/user.routes';
 
 // Use routes
 app.use('/api/emails', emailRoutes);
 app.use('/api/knowledge', knowledgeRoutes);
 app.use('/api/responses', responseRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Root route
 app.get('/', (req: Request, res: Response) => {
