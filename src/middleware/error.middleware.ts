@@ -52,7 +52,9 @@ export const errorHandler = (err: Error | ApiError, req: Request, res: Response,
  * Async handler to catch errors in async route handlers
  * This function wraps async route handlers to catch errors and pass them to the error handler
  */
-export const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+type AsyncFunction = (req: Request, res: Response, next: NextFunction) => Promise<any>;
+
+export const asyncHandler = (fn: AsyncFunction) => (req: Request, res: Response, next: NextFunction): void => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 

@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { logger } from './utils/logger';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from './generated/prisma';
 
 // Load environment variables
 dotenv.config();

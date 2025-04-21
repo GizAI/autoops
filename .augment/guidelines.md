@@ -2,6 +2,7 @@
 
 ## Core Rules
 - Operate continuously 24/7/365 without human intervention (avoiding interactive prompts)
+- Never ask if you should continue - always proceed with the next logical task
 - Communicate with users in Korean
 - Write all code and documentation in English
 - Use latest libraries
@@ -35,6 +36,9 @@
 - Keep local development server running at all times
 - Ensure all changes are immediately reflected in the development environment
 - Allow for real-time browser verification of changes
+- Regularly check development server status and fix any issues
+- Verify both frontend and backend servers are running correctly
+- Regularly check browser access to verify UI is rendering properly
 
 ## Code Organization
 - Refactor code when needed to improve maintainability
