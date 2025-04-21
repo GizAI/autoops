@@ -22,12 +22,16 @@ const nextConfig = {
       },
     ];
   },
-  // Allow development origins
-  allowedDevOrigins: ['*'],
+
   // Allow connections from any IP
   experimental: {
-    serverComponentsExternalPackages: ['puppeteer']
+    serverExternalPackages: ['puppeteer']
   },
+  // Allow remote access
+  hostname: '0.0.0.0',
+  port: 3000,
+  // Allow cross-origin requests
+  allowedDevOrigins: ['*'],
 };
 
 module.exports = nextConfig;

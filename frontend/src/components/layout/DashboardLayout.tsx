@@ -23,6 +23,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         setUserRole(user.role);
       } catch (error) {
         console.error('Failed to fetch user profile:', error);
+        // If we can't get the user profile, check if we have a token
+        const token = localStorage.getItem('token');
+        if (!token) {
+          // If no token, redirect to login
+          window.location.href = '/auth/login';
+        }
       }
     };
 

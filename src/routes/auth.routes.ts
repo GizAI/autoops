@@ -10,6 +10,9 @@ const router = Router();
 router.post('/login', asyncHandler(authController.login));
 router.get('/gmail/callback', asyncHandler(authController.gmailCallback));
 
+// Protected routes
+router.get('/me', authenticate, asyncHandler(authController.getCurrentUser));
+
 // Admin-only routes
 router.post('/register', authenticate, isAdmin, asyncHandler(authController.register));
 router.get('/gmail/auth', authenticate, isAdmin, asyncHandler(authController.gmailAuth));

@@ -52,6 +52,14 @@
   - `npm run test:e2e:ui` - Run tests with UI mode
   - `npm run test:e2e:debug` - Run tests in debug mode
   - `npm run test:e2e:report` - Show test reports
+- Server monitoring and maintenance:
+  - Check server status every 5 minutes using `list-processes`
+  - Restart servers if they crash or stop responding
+  - Verify backend server is running on port 3001 with `netstat -tulpn | grep 3001`
+  - Verify frontend server is running on port 3000 with `netstat -tulpn | grep 3000`
+  - Check server logs for errors and fix them immediately
+  - Monitor browser console for errors and fix them
+  - Test API endpoints with curl or Playwright to verify they're working
 - Avoid common mistakes:
   - Always check for correct API paths in proxy settings
   - Ensure API endpoints match between frontend and backend
@@ -59,6 +67,8 @@
   - Check for port conflicts between frontend and backend servers
   - Use relative API paths in frontend code when possible
   - Test with both local and remote access scenarios
+  - Verify proxy settings in next.config.js are correct
+  - Check CORS settings in backend server
   - Monitor browser console for errors during testing
   - Verify network requests in browser developer tools
 - Document test results with evidence of successful operation
