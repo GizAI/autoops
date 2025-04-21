@@ -3,6 +3,7 @@ import { google } from 'googleapis';
 import { prisma } from '../index';
 import { logger } from '../utils/logger';
 import { generateEmailResponse } from '../services/openai.service';
+import { notificationService } from '../services/notification.service';
 
 // Gmail API setup
 const gmail = google.gmail('v1');
@@ -351,6 +352,14 @@ export const sendResponse = async (req: Request, res: Response) => {
       threadId: response.threadId,
       timestamp: new Date().toISOString()
     });
+
+    // Send notification to user about the response
+    await notificationService.notifyUserOfResponse(
+      originalEmail.fromEmail,
+      parseInt(id),
+      response.subject,
+      response.body
+    );
 
     res.json(updatedResponse);
   } catch (error) {

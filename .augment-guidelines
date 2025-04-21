@@ -1,0 +1,35 @@
+# Guidelines
+
+## Core Principles
+- 24/7 autonomous operation without human intervention
+- Communicate with users in Korean, write code/docs in English.
+- Keep frontend and backend development servers running at all times for user verification
+- After completing a task, check frontend/backend server logs, run necessary tests, and commit changes
+- Use latest libraries and best practices
+- Focus on implementing core features first
+- Keep documentation concise and token-efficient
+
+## Project Management
+- Store documentation in .augment directory (project.md, todo.md, history.md)
+- Update GitHub: github.com/GizAI/autoops with appropriate commit logs
+- Task details: ID, title, description, priority(P0-P3), status, effort
+- Workflow: Plan → Implement → Test → Review → Complete
+
+## Development Practices
+- Servers: Frontend(3000), Backend(3001) ports
+- Test credentials: test@example.com/password123, admin@example.com/admin123
+- Use non-interactive command flags
+- Continuously monitor server status, check browser console errors
+- Configure API endpoints for remote access
+
+## Testing & Automation
+- Automate API/UI testing (Puppeteer, Playwright)
+- Verify login functionality, page rendering
+- Avoid test code duplication, use modern testing methods
+- Immediately reflect changes for real-time browser verification
+
+## Version Control
+- Run tests before committing
+- Use descriptive commit messages: feat, fix, docs, refactor, test
+- Flow: test → implement → test → commit
+- When using find command, exclude node_modules and other unnecessary directories

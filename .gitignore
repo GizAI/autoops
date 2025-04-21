@@ -31,3 +31,8 @@ build/
 # OS specific files
 .DS_Store
 Thumbs.db
+
+test-results
+playwright-report
+
+litellm_env

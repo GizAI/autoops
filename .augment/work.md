@@ -23,15 +23,10 @@
 - Created GitHub repository and pushed code
 
 ## Current Tasks
-- Add user management for admin
 - Implement email notification system
 - Add search functionality across emails
 - Improve test coverage with Playwright E2E tests
 
-- Add user management for admin ✓
-- Implement email notification system ✓
-- Add search functionality across emails ✓
-- Improve test coverage with Playwright E2E tests ✓
 ## Completed Tasks (continued)
 - Set up Next.js frontend project structure ✓
 - Set up API client for backend communication ✓
@@ -54,6 +49,7 @@
 - Implemented continuous operation system ✓
 - Added task queue for automatic task processing ✓
 - Updated guidelines for non-stop operation ✓
+- Added user management functionality ✓
 
 ## Next Tasks
 

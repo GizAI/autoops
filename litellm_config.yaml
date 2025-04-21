@@ -1,0 +1,34 @@
+model_list:
+  - model_name: gpt-3.5-turbo
+    litellm_params:
+      model: openai/gpt-3.5-turbo
+
+  - model_name: gpt-4
+    litellm_params:
+      model: openai/gpt-4
+
+  - model_name: gpt-4-turbo
+    litellm_params:
+      model: openai/gpt-4-turbo
+
+  - model_name: claude-3-opus
+    litellm_params:
+      model: anthropic/claude-3-opus-20240229
+
+  - model_name: mock
+    litellm_params:
+      model: mock_completion
+
+litellm_settings:
+  drop_params: True
+  set_verbose: True
+
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 3
+  timeout: 30
+  fallbacks: [{"gpt-4": ["gpt-3.5-turbo"]}]
+
+general_settings:
+  completion_model: gpt-3.5-turbo
+  embedding_model: text-embedding-3-small
